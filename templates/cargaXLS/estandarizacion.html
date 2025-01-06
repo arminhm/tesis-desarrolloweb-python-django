@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Datos Estandarizados del Archivo: {{ nombre_archivo }}</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if clasificaciones %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Nombre de la Fila</th>
+                    <th>Tipo de Dato</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for fila in clasificaciones %}
+                    <tr>
+                        <td>{{ fila.columna_nombre }}</td>
+                        <td>{{ fila.tipo_dato }}</td>
+                        <td style="background-color: lightgreen; color: white; font-weight: bold;">Completado</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="mt-4">
+            <a href="{% url 'numero_cluster' nombre_archivo %}" class="btn btn-primary">Ver Numeros de Cluster Posibles</a> 
+        </div>
+    {% else %}
+        <p>No se encontraron datos procesados.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Gráficos de la Base: {{ nombre_archivo }}</h2>
+
+    <!-- Mostrar mensajes -->
+    {% if messages %}
+        <div class="alert alert-info">
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if columnas_numericas %}
+        <div class="form-group">
+            <label for="columnSelector">Seleccionar Columna para Gráfico:</label>
+            <select id="columnSelector" class="form-control">
+                {% for columna in columnas_numericas %}
+                    <option value="{{ columna }}">{{ columna }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Interruptor para cambiar el tipo de gráfico -->
+        <div class="form-group mt-3">
+            <label for="chartTypeSelector">Tipo de Gráfico:</label>
+            <select id="chartTypeSelector" class="form-control">
+                <option value="column">Gráfico de Barras</option>
+                <option value="pie">Gráfico de Torta</option>
+            </select>
+        </div>
+
+        <div id="chartContainer" class="mt-4"></div>
+
+        <script src="https://code.highcharts.com/highcharts.js"></script>
+        <script>
+            const datosColumnas = {{ datos_columnas|safe }};
+            const nombresEmpresas = {{ nombres_empresas|safe }};
+            const columnaNombre = "{{ columna_nombre }}";
+            const columnSelector = document.getElementById('columnSelector');
+            const chartTypeSelector = document.getElementById('chartTypeSelector');
+            const chartContainer = document.getElementById('chartContainer');
+
+            function renderChart(column, chartType) {
+                if (datosColumnas[column]) {
+                    const categories = nombresEmpresas;  // Usamos los nombres de las empresas como categorías
+
+                    let chartOptions = {
+                        chart: {
+                            type: chartType
+                        },
+                        title: {
+                            text: `Gráfico de la Columna: ${column}`
+                        },
+                        xAxis: {
+                            categories: categories,
+                            title: {
+                                text: columnaNombre
+                            }
+                        },
+                        yAxis: {
+                            title: {
+                                text: 'Valor'
+                            }
+                        },
+                        series: [{
+                            name: column,
+                            data: datosColumnas[column],
+                            tooltip: {
+                                pointFormatter: function() {
+                                    return `<b>Empresa:</b> ${nombresEmpresas[this.point.index]}<br><b>Valor:</b> ${this.y}`;
+                                }
+                            }
+                        }]
+                    };
+
+                    // Si se selecciona un gráfico de torta, se modifica la estructura del gráfico
+                    if (chartType === 'pie') {
+                        chartOptions.plotOptions = {
+                            pie: {
+                                dataLabels: {
+                                    enabled: true,
+                                    format: '{point.name}: {point.y}'
+                                }
+                            }
+                        };
+                        chartOptions.series[0].type = 'pie';
+                        chartOptions.series[0].data = datosColumnas[column].map((valor, index) => ({
+                            name: nombresEmpresas[index],
+                            y: valor
+                        }));
+                        delete chartOptions.xAxis;  // Eliminar el eje X para el gráfico de torta
+                    }
+
+                    Highcharts.chart(chartContainer, chartOptions);
+                }
+            }
+
+            if (columnSelector.options.length > 0) {
+                const initialChartType = chartTypeSelector.value;
+                renderChart(columnSelector.options[0].value, initialChartType);
+            }
+
+            columnSelector.addEventListener('change', (event) => {
+                renderChart(event.target.value, chartTypeSelector.value);
+            });
+
+            chartTypeSelector.addEventListener('change', (event) => {
+                renderChart(columnSelector.value, event.target.value);
+            });
+        </script>
+        <div class="mt-4">
+            <a href="{% url 'estandarizacion' nombre_archivo %}" class="btn btn-primary">Preparar los Datos</a> 
+        </div>
+    {% else %}
+        <p>No hay columnas numéricas disponibles para mostrar gráficos.</p>
+    {% endif %}
+</div>
+{% endblock %}

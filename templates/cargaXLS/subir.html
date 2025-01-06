@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Subir Archivo XLS</h2>
+  {% if mensaje %}
+    <div class="alert alert-warning" role="alert">
+      {{ mensaje }}
+    </div>
+  {% endif %}
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="nombre_archivo">Nombre del archivo:</label>
+      <input type="text" class="form-control" id="nombre_archivo" name="nombre_archivo" required>
+    </div>
+    <div class="form-group">
+      <label for="archivo_xls">Selecciona un archivo:</label>
+      <input type="file" class="form-control" id="archivo_xls" name="archivo_xls" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Subir</button>
+  </form>
+</div>
+{% endblock %}

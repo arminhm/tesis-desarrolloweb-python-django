@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Big Analytics{% endblock %}</title>
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+    <!-- Scripts de Highcharts (si necesitas gráficos) -->
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <!-- Barra superior -->
+    <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Big Analytics</a>
+      <ul class="navbar-nav px-3">
+        <li class="nav-item text-nowrap">
+          <a class="nav-link" href="#">Sign out</a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="container-fluid mt-5">
+      <div class="row">
+        <!-- Barra lateral izquierda -->
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+          <div class="sidebar-sticky">
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link" href="/">
+                  Subir Archivo
+                </a>
+              </li>
+              <li class="nav-item">
+                <h6>Archivos Cargados :</h6>
+                <ul class="nav flex-column">
+                  {% for archivo in archivos_disponibles %}
+                    <li class="nav-item d-flex justify-content-between align-items-center">
+                      <a class="nav-link" href="{% url 'resumen_filas' archivo.archivo_nombre %}">
+                        {{ archivo.archivo_nombre }}
+                      </a>
+                      <form method="post" action="{% url 'eliminar_archivo' %}" class="d-inline-block">
+                        {% csrf_token %}
+                        <input type="hidden" name="archivo_a_eliminar" value="{{ archivo.archivo_nombre }}">
+                        <button type="submit" class="btn btn-sm btn-danger">X</button>
+                      </form>
+                    </li>
+                  {% empty %}
+                    <li class="nav-item">No hay archivos disponibles.</li>
+                  {% endfor %}
+                </ul>
+              </li>
+              <li class="nav-item">
+                <h6>Datos Estandarizados :</h6>
+                <ul class="nav flex-column">
+                  {% for archivo in datos_estandarizados %}
+                    <li class="nav-item d-flex justify-content-between align-items-center">
+                      <a class="nav-link" href="{% url 'numero_cluster' archivo.nombre_archivo %}">
+                        {{ archivo.nombre_archivo }}
+                      </a>
+                    </li>
+                  {% empty %}
+                    <li class="nav-item">No hay archivos disponibles.</li>
+                  {% endfor %}
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </nav>
+
+        <!-- Contenido principal -->
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+          {% block content %}
+          {% endblock %}
+        </main>
+      </div>
+    </div>
+
+    <!-- Scripts de Bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"></script>
+  </body>
+</html>

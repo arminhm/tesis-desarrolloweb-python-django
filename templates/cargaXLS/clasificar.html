@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Clasificar Columnas para "{{ archivo_nombre }}"</h2>
+  
+  <!-- Mostrar mensajes de error o éxito -->
+  {% if messages %}
+    <div class="alert alert-warning" role="alert">
+      {% for message in messages %}
+        {{ message }}
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Nombre Actual</th>
+          <th>Nuevo Nombre</th>
+          <th>Tipo de Dato</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for columna in columnas %}
+        <tr>
+          <!-- Mostrar el nombre original como texto -->
+          <td>{{ columna }}</td>
+          
+          <!-- Input para cambiar el nombre -->
+          <td>
+            <input 
+              type="text" 
+              name="nombre_{{ columna }}" 
+              class="form-control" 
+              value="{{ columna }}" 
+              required>
+          </td>
+          
+          <!-- Selector para el tipo de dato -->
+          <td>
+            <select 
+              name="tipo_{{ columna }}" 
+              class="form-control" 
+              required>
+              <option value="real">Real</option>
+              <option value="categorico">Categórico</option>
+              <option value="entero">Entero</option>
+            </select>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <button type="submit" class="btn btn-success">Guardar Clasificación</button>
+  </form>
+</div>
+{% endblock %}

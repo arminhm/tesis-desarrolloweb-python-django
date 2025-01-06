@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Análisis de Número de Clusters{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center">Análisis de Número de Clusters</h1>
+    <h3 class="text-center">Archivo: {{ nombre_archivo }}</h3>
+
+    <!-- Selector de Número de Clusters -->
+    <div class="mt-4">
+        <label for="clusterSelector">Seleccionar número de Clusters:</label>
+        <select id="clusterSelector" class="form-control">
+            <option value="2">2 Clusters</option>
+            <option value="3">3 Clusters</option>
+            <option value="4">4 Clusters</option>
+            <option value="5">5 Clusters</option>
+        </select>
+        <a href="#" class="btn btn-primary mt-3" id="clusterBtn">Clusteriza con KMeans</a>
+    </div>
+
+    <div class="mt-4">
+        <canvas id="sseChart"></canvas>
+    </div>
+
+    <script>
+        // Datos de SSE y número de clusters
+        const sseData = JSON.parse('{{ sse_data|escapejs }}');
+
+        const labels = sseData.map(d => d.k); // Números de clusters (k)
+        const sseValues = sseData.map(d => d.sse); // Valores de SSE
+
+        // Configuración del gráfico
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: 'Suma de Errores Cuadráticos (SSE)',
+                data: sseValues,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                tension: 0.1
+            }]
+        };
+
+        const config = {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Número de Clusters vs SSE'
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Número de Clusters (k)'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Suma de Errores Cuadráticos (SSE)'
+                        }
+                    }
+                }
+            }
+        };
+
+        // Renderizar el gráfico
+        const sseChart = new Chart(
+            document.getElementById('sseChart'),
+            config
+        );
+
+        // Lógica para enviar el número de clusters seleccionado al hacer clic en el botón
+        const clusterBtn = document.getElementById('clusterBtn');
+        const clusterSelector = document.getElementById('clusterSelector');
+
+        clusterBtn.addEventListener('click', function () {
+            const selectedClusters = clusterSelector.value;
+            const url = `{% url 'clusterizar' nombre_archivo %}?clusters=` + selectedClusters;
+            window.location.href = url; // Redirigir al URL con el número de clusters seleccionado
+        });
+    </script>
+</div>
+{% endblock %}

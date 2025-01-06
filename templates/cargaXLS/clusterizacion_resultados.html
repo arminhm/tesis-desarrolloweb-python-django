@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Resultados de Clusterización: {{ nombre_archivo }}</h2>
+
+    <h4>Cantidad de registros por Cluster:</h4>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Cluster</th>
+                <th>Cantidad de Registros</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cluster, count in cluster_counts.items %}
+                <tr>
+                    <td>{{ cluster }}</td>
+                    <td>{{ count }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Botón para volver atrás -->
+    <div class="mt-3">
+        <a href="{% url 'numero_cluster' nombre_archivo %}" class="btn btn-secondary">Volver atrás</a>
+        <a href="" class="btn btn-secondary">Ver Detalles de Clusters</a>
+        <a href="" class="btn btn-secondary">Entrenar Modelo Prodictivo</a>
+    </div>
+</div>
+{% endblock %}

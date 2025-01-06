@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Describe de la Base: {{ nombre_archivo }}</h2>
+  <p>Total de filas actuales: {{ total_filas }}</p>
+
+  {% if columnas_numericas %}
+    <div class="form-group">
+      <label for="columnSelector">Seleccionar Columna:</label>
+      <select id="columnSelector" class="form-control">
+        {% for columna in columnas_numericas %}
+          <option value="{{ columna }}">{{ columna }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    
+    <div id="describeTable" class="mt-4">
+      <!-- Tabla de Describe se cargará aquí -->
+    </div>
+  {% else %}
+    <p>No hay columnas numéricas disponibles para mostrar.</p>
+  {% endif %}
+  <div class="mt-4">
+    <a href="{% url 'graficos' nombre_archivo %}" class="btn btn-primary">Ir a gráficos</a>
+  </div>
+
+</div>
+
+<script>
+  const describeData = {{ describe_data|safe }};
+  const describeTable = document.getElementById('describeTable');
+  const columnSelector = document.getElementById('columnSelector');
+
+  // Función para actualizar la tabla según la columna seleccionada
+  function updateDescribeTable(column) {
+    if (describeData[column]) {
+      let tableHtml = `
+        <table class="table table-bordered">
+          <thead>
+            <tr><th>Estadística</th><th>Valor</th></tr>
+          </thead>
+          <tbody>
+            ${Object.entries(describeData[column]).map(([stat, value]) => `
+              <tr>
+                <td>${stat}</td>
+                <td>${value.toFixed(2)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>`;
+      describeTable.innerHTML = tableHtml;
+    } else {
+      describeTable.innerHTML = "<p>No hay datos para esta columna.</p>";
+    }
+  }
+
+  // Manejar cambio de selección
+  columnSelector.addEventListener('change', (event) => {
+    updateDescribeTable(event.target.value);
+  });
+
+  // Cargar la primera columna por defecto
+  if (columnSelector.options.length > 0) {
+    updateDescribeTable(columnSelector.options[0].value);
+  }
+</script>
+{% endblock %}
